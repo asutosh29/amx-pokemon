@@ -336,6 +336,10 @@ function computeDamage() {
     console.log(player2CurrentPokemon.moves[player2.currentMove])
 
     player2CurrentPokemon.hp -= player1CurrentPokemon.moves[player1.currentMove].power * multiplier
+    if (player2CurrentPokemon.hp <= 0) {
+        player2.currentMove = null
+    }
+
     console.log('after damage: ', player2CurrentPokemon.hp)
     updatePokemon2(player2CurrentPokemon)
 
@@ -345,12 +349,17 @@ function computeDamage() {
             endGame({ 'name': player1.alias })
         } else {
             document.getElementById('moves2').innerText = ''
+            player2.currentPokemon = null
             instructor('Player 2 please select an Alive Pokemon!')
             updateUI()
         }
 
     } else {
         player1CurrentPokemon.hp -= player2CurrentPokemon.moves[player2.currentMove].power * multiplier
+
+        if (player1CurrentPokemon.hp <= 0) {
+            player1.currentMove = null
+        }
         console.log('after damage: ', player1CurrentPokemon.hp)
         updatePokemon1(player1CurrentPokemon)
         if (player1CurrentPokemon.hp <= 0) {
@@ -390,7 +399,6 @@ async function battle() {
     } else {
 
         if (player1.pokemons[player1.currentPokemon].hp >= 0 && player2.pokemons[player2.currentPokemon].hp >= 0) {
-
             computeDamage()
             updateUI()
         }
