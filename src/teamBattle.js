@@ -358,11 +358,11 @@ async function computeDamage() {
     console.log(player1CurrentPokemon.moves[player1.currentMove])
     console.log(player2CurrentPokemon.moves[player2.currentMove])
 
-    player2CurrentPokemon.hp -= player1CurrentPokemon.moves[player1.currentMove].power * multiplier
+    const player2DamageTaken = player1CurrentPokemon.moves[player1.currentMove].power * multiplier
+    player2CurrentPokemon.hp -= player2DamageTaken
 
-
-
-
+    instructor(`${player1.alias} used ${player1CurrentPokemon.moves[player1.currentMove].name}`)
+    await sleep(1000)
 
 
     player1CurrentPokemon.moves[player1.currentMove].pp--;
@@ -384,6 +384,9 @@ async function computeDamage() {
     await sleep(2000)
     battlePokemon1.classList.remove('animate1')
 
+    instructor(`${player1.alias} gave ${player2DamageTaken} hp damage`)
+    await sleep(1000)
+
     console.log('after damage: ', player2CurrentPokemon.hp)
     updatePokemon2(player2CurrentPokemon)
 
@@ -394,12 +397,17 @@ async function computeDamage() {
         } else {
             document.getElementById('moves2').innerText = ''
             player2.currentPokemon = null
-            instructor('Player 2 please select an Alive Pokemon!')
+            instructor(`${player2.alias} please select an Alive Pokemon!`)
             updateUI()
         }
 
     } else {
-        player1CurrentPokemon.hp -= player2CurrentPokemon.moves[player2.currentMove].power * multiplier
+        const player1DamageTaken = player2CurrentPokemon.moves[player2.currentMove].power * multiplier
+        player1CurrentPokemon.hp -= player1DamageTaken
+
+        instructor(`${player2.alias} used ${player2CurrentPokemon.moves[player2.currentMove].name}`)
+        await sleep(1000)
+
         if (battlePokemon2.classList.contains('animate2')) {
 
             battlePokemon2.classList.remove('animate2')
@@ -411,14 +419,16 @@ async function computeDamage() {
         await sleep(2000)
         battlePokemon2.classList.remove('animate2')
 
-
-
-
+        instructor(`${player2.alias} gave ${player1DamageTaken} hp damage`)
+        await sleep(1000)
 
         player2CurrentPokemon.moves[player2.currentMove].pp--;
         player1.currentMove = null
         renderPokemon1(player1CurrentPokemon)
         renderPokemon2(player2CurrentPokemon)
+
+        instructor(`Please Select Moves`)
+        await sleep(1000)
 
 
         if (player1CurrentPokemon.hp <= 0) {
@@ -432,7 +442,7 @@ async function computeDamage() {
                 endGame({ 'name': player2.alias })
             } else {
                 document.getElementById('moves1').innerText = ''
-                instructor('Player 1 please select an Alive Pokemon!')
+                instructor(`${player1.alias} please select an Alive Pokemon!`)
                 updateUI()
             }
 
