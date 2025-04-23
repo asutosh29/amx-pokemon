@@ -17,6 +17,15 @@ const move = {
 */
 
 
+
+
+function log() {
+    console.log("--- Player 1 ---")
+    console.log(player1)
+    console.log("--- Player 2 ---")
+    console.log(player2)
+}
+
 // DB
 const game = {
     'rounds': 0,
@@ -110,7 +119,7 @@ async function renderPokemon1(pok) {
     const pokMoves = pok.moves //List of all moves
 
     const pokNameElem = document.getElementById('player1')
-    pokNameElem.innerText = `Current Pokemon: ${pokName}`
+    pokNameElem.innerText = `${pokName}`
     const pokHPElem = document.getElementById('hp1')
     pokHPElem.innerText = hp
     const pokFrontSpriteElem = document.querySelector('.left .pokemon_front img')
@@ -128,19 +137,23 @@ async function renderPokemon1(pok) {
         move.id = `${i}`
 
         let move_name = document.createElement('p')
-        move_name.innerText = `Name: ${moveData.name}`
+        move_name.classList.add('move-name')
+        move_name.innerText = `${moveData.name}`
         let move_accuracy = document.createElement('p')
-        move_accuracy.innerText = `Move accuracy: ${moveData.accuracy}`
+        move_accuracy.innerText = `accuracy: ${moveData.accuracy}`
         let move_pp = document.createElement('p')
-        move_pp.innerText = `Move pp: ${moveData.pp}`
+        move_pp.innerText = `pp: ${moveData.pp}`
         let move_power = document.createElement('p')
-        move_power.innerText = `Move power: ${moveData.power}`
+        move_power.innerText = `power: ${moveData.power}`
 
         move.append(move_name, move_accuracy, move_pp, move_power)
 
         moves.append(move)
 
     }
+
+    const battlePokemon = document.getElementById("pokemonBattle1")
+    battlePokemon.src = pokBackSprite
 }
 async function renderPokemon2(pok) {
     const pokName = pok.name
@@ -150,7 +163,7 @@ async function renderPokemon2(pok) {
     const pokMoves = pok.moves //List of all moves
 
     const pokNameElem = document.getElementById('player2')
-    pokNameElem.innerText = `Current Pokemon: ${pokName}`
+    pokNameElem.innerText = `${pokName}`
     const pokHPElem = document.getElementById('hp2')
     pokHPElem.innerText = hp
     const pokFrontSpriteElem = document.querySelector('.right .pokemon_front img')
@@ -168,19 +181,23 @@ async function renderPokemon2(pok) {
         move.id = `${i}`
 
         let move_name = document.createElement('p')
-        move_name.innerText = `Name: ${moveData.name}`
+        move_name.classList.add('move-name')
+        move_name.innerText = `${moveData.name}`
         let move_accuracy = document.createElement('p')
-        move_accuracy.innerText = `Move accuracy: ${moveData.accuracy}`
+        move_accuracy.innerText = `accuracy: ${moveData.accuracy}`
         let move_pp = document.createElement('p')
-        move_pp.innerText = `Move pp: ${moveData.pp}`
+        move_pp.innerText = `pp: ${moveData.pp}`
         let move_power = document.createElement('p')
-        move_power.innerText = `Move power: ${moveData.power}`
+        move_power.innerText = `power: ${moveData.power}`
 
         move.append(move_name, move_accuracy, move_pp, move_power)
 
         moves.append(move)
 
     }
+
+    const battlePokemon = document.getElementById("pokemonBattle2")
+    battlePokemon.src = pokFrontSprite
 }
 
 function updatePokemon1(pok) {
@@ -188,6 +205,7 @@ function updatePokemon1(pok) {
     if (pok.hp <= 0) {
         pok.hp = 0
         hp1.innerText = `HP: ${0}`
+
     } else {
         hp1.innerText = `HP: ${pok.hp}`
     }
@@ -321,12 +339,17 @@ async function initPlayer2(alias = 'Player 2', pokemons) {
 }
 
 
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 
-
-function computeDamage() {
+async function computeDamage() {
     const multiplier = 0.2
     console.log("-- computing damages --")
+    const battlePokemon1 = document.getElementById("pokemonBattle1")
+    const battlePokemon2 = document.getElementById("pokemonBattle2")
+
     const player1CurrentPokemon = player1.pokemons[player1.currentPokemon]
     const player2CurrentPokemon = player2.pokemons[player2.currentPokemon]
     console.log('before damage: ', player1CurrentPokemon.hp)
@@ -336,9 +359,30 @@ function computeDamage() {
     console.log(player2CurrentPokemon.moves[player2.currentMove])
 
     player2CurrentPokemon.hp -= player1CurrentPokemon.moves[player1.currentMove].power * multiplier
+
+
+
+
+
+
+    player1CurrentPokemon.moves[player1.currentMove].pp--;
+    player1.currentMove = null
+    renderPokemon1(player1CurrentPokemon)
+    // renderPokemon2(player2CurrentPokemon)
+
     if (player2CurrentPokemon.hp <= 0) {
         player2.currentMove = null
     }
+    if (battlePokemon1.classList.contains('animate1')) {
+
+        battlePokemon1.classList.remove('animate1')
+        battlePokemon1.classList.add('animate1')
+    } else {
+        battlePokemon1.classList.add('animate1')
+
+    }
+    await sleep(2000)
+    battlePokemon1.classList.remove('animate1')
 
     console.log('after damage: ', player2CurrentPokemon.hp)
     updatePokemon2(player2CurrentPokemon)
@@ -356,6 +400,26 @@ function computeDamage() {
 
     } else {
         player1CurrentPokemon.hp -= player2CurrentPokemon.moves[player2.currentMove].power * multiplier
+        if (battlePokemon2.classList.contains('animate2')) {
+
+            battlePokemon2.classList.remove('animate2')
+            battlePokemon2.classList.add('animate2')
+        } else {
+            battlePokemon2.classList.add('animate2')
+
+        }
+        await sleep(2000)
+        battlePokemon2.classList.remove('animate2')
+
+
+
+
+
+        player2CurrentPokemon.moves[player2.currentMove].pp--;
+        player1.currentMove = null
+        renderPokemon1(player1CurrentPokemon)
+        renderPokemon2(player2CurrentPokemon)
+
 
         if (player1CurrentPokemon.hp <= 0) {
             player1.currentMove = null
@@ -375,32 +439,31 @@ function computeDamage() {
         }
     }
 
-
-
-    // if (player1.pokemons[0].hp <= 0 || player2.pokemons[0].hp <= 0) {
-    //     const winner = player1.pokemons[0].hp <= 0 ? player2.alias : player1.alias
-    //     console.log(winner)
-    //     endGame({ 'name': winner })
-    // }
-
-
 }
 function endGame(winner) {
     instructor("Game ended!", `Winner ${winner.name}`)
     console.log("Game ended!", `Winner ${winner.name}`)
     const battle = (document.getElementById('battle-btn'))
+    const moves1 = document.getElementById('moves1')
+    const moves2 = document.getElementById('moves2')
+    moves1.remove()
+    moves2.remove()
     battle.remove()
 }
 
 async function battle() {
     game.rounds++;
+
     if (player1.currentMove === null || player2.currentMove === null) {
         instructor("Please Choose your Moves!!!")
     } else {
-
         if (player1.pokemons[player1.currentPokemon].hp >= 0 && player2.pokemons[player2.currentPokemon].hp >= 0) {
-            computeDamage()
-            updateUI()
+            if (player1.pokemons[player1.currentPokemon].moves[player1.currentMove].pp === 0 || player2.pokemons[player2.currentPokemon].moves[player2.currentMove].pp === 0) {
+                instructor("Please select a Move with Valid PP")
+            } else {
+                computeDamage()
+                updateUI()
+            }
         }
     }
 

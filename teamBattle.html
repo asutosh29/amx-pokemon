@@ -7,9 +7,41 @@
     <title>Team Battle</title>
 
     <style>
+        :root {
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
         * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #5ca71f;
+            color: white;
+        }
+
+        /* Utils */
+        .title {
+            font-size: 3rem;
+        }
+
+        #heading {
+            text-align: center;
+        }
+
+        #battle-btn {
+            background-color: greenyellow;
+            color: black;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 1rem;
+        }
+
+        .wrapper {
+
+            margin: 0 auto;
         }
 
         .battle-ground {
@@ -18,7 +50,19 @@
         }
 
         .battle-ground>div {
-            border: 1px solid red;
+            border: 2px solid black;
+            padding: 1rem;
+            margin: 0.5rem;
+        }
+        .right,.left{
+            width: 30%;
+        }
+        .centre{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 50%;
+            
         }
 
         .left,
@@ -27,67 +71,212 @@
             padding: 1rem;
         }
 
+        .pokemon-heading {
+            margin: 0.5rem 0;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        #player1Alias,
+        #player2Alias {
+            font-size: 2rem;
+            margin: 0.75rem 0;
+            font-weight: 800;
+
+        }
+
+        #player1,
+        #player2 {
+            font-size: 2rem;
+            text-transform: capitalize;
+            font-weight: 500;
+        }
+
+        .moves {
+            display: flex;
+            flex-wrap: wrap;
+
+        }
+
         .move {
-            border: 1px solid green;
+            background-color: green;
+            padding: 1rem;
             margin: 1rem 0;
+            border-radius: 1rem;
+            width: 85%;
+
+        }
+        .move-name{
+            font-weight: 800;
+            font-size: 1.25rem;
         }
 
         .selectedMove {
-            background-color: lightblue;
+            background-color: rgb(0, 89, 0);
+        }
+
+        
+
+        #canvas {
+            /* width: clamp(100%, 100%, 28rem); */
+            width: 32rem;
+            height: 21rem;
+            background-color: aqua;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        #canvas .top {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        #canvas .bottom {
+            display: flex;
+            justify-content: flex-start;
+        }
+        #battle-bottom{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #instructions {
+            width: 100%;
+            text-align: center;
+            background-color: #73cb2a;
+            
+            border-radius: 1rem;
+            border: 5px solid green;
+            margin: 1rem 0;
+            padding: 2rem 1rem;
+
+            font-size: 2rem;
+        }
+
+        .team {
+            display: flex;
+            justify-content: space-between;
+            /* margin: 0.1rem; */
+            line-break: auto;
         }
 
         .member {
-            background-color: lightblue;
+            background-color: green;
+            border-radius: 1rem;
             height: 200px;
-            width: 90px;
+            padding: 1rem;
+            margin: 0.25rem;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #pokemonBattle1,
+        #pokemonBattle2 {
+            margin: 2rem 5rem;
+        }
+
+
+        /* ANIMATIONS UTILS */
+
+        .animate1 {
+            animation-name: animatePlayer1;
+            animation-duration: 2s;
+        }
+
+        .animate2 {
+            animation-name: animatePlayer2;
+            animation-duration: 2s;
+        }
+
+        @keyframes animatePlayer1 {
+            0% {}
+
+            50% {
+                transform: translate(16rem, -10rem);
+            }
+
+            100% {}
+        }
+
+        @keyframes animatePlayer2 {
+            0% {}
+
+            50% {
+                transform: translate(-16rem, 10rem);
+            }
+
+            100% {}
         }
     </style>
 </head>
 
 <body>
-    <h1>Welcome to the pokemon Team Battle</h1>
-    <div class="battle-ground">
-        <div class="left">
-            <h1 id="player1Alias"></h1>
-            <h1 id="player1">Pokemon 1: ()</h1>
-            <div class="pokemon" id="pokemon1">
-                <div id="pokemon_front" class="pokemon_front">
-                    <img src="" alt="Pokemon Front Sprite" id="pokeFront">
-                </div>
-                <div class="stats">
-                    <p id="hp1"></p>
-                </div>
-                <div class="moves" id="moves1">
-                    <h2>Moves:</h2>
+    <div class="wrapper">
+        <h1 class="title" id="heading">Welcome to the pokemon Team Battle</h1>
+        <div class="battle-ground">
+            <div class="left">
+                <h1 id="player1Alias"></h1>
+                <h2 class="pokemon-heading">Current Pokemon: </h2>
+                <h2 id="player1">Pokemon 1: ()</h2>
+                <div class="pokemon" id="pokemon1">
+                    <div id="pokemon_front" class="pokemon_front">
+                        <img src="" alt="Pokemon Front Sprite" id="pokeFront">
+                    </div>
+                    <div class="stats">
+                        <p id="hp1"></p>
+                    </div>
+                    <div class="moves" id="moves1">
+                        <h2>Moves:</h2>
 
+                    </div>
+                </div>
+                <h1>Team:</h1>
+                <div class="team">
                 </div>
             </div>
-            <h1>Team:</h1>
-            <div class="team">
-            </div>
-        </div>
-        <div class="centre">
-            <h1>Battle here</h1>
-            <div id="instructions"></div>
-            <button id="battle-btn">Battle!</button>
-        </div>
-        <div class="right">
-            <h1 id="player2Alias"></h1>
-            <h1 id="player2">Pokemon 2: ()</h1>
-            <div class="pokemon" id="pokemon2">
-                <div id="pokemon_front" class="pokemon_front">
-                    <img src="" alt="Pokemon Front Sprite" id="pokeFront">
+            <div class="centre">
+                <h1 class="title">Battle here</h1>
+                <div id="canvas">
+                    <div class="top">
+                        <img id="pokemonBattle2" class="battle-pokemon"
+                            src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png'
+                            alt="player2Front">
+                    </div>
+                    <div class="bottom">
+                        <img id="pokemonBattle1" class="battle-pokemon"
+                            src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/25.png'
+                            alt="player1Back">
+                    </div>
                 </div>
-                <div class="stats">
-                    <p id="hp2"></p>
+                <div id="instructions"></div>
+                <div id="battle-bottom">
+                    <button id="battle-btn">Battle!</button>
                 </div>
-                <div class="moves" id="moves2">
-                    <h2>Moves:</h2>
 
-                </div>
             </div>
-            <h1>Team:</h1>
-            <div class="team">
+            <div class="right">
+                <h1 id="player2Alias"></h1>
+                <h2 class="pokemon-heading">Current Pokemon: </h2>
+                <h2 id="player2">Pokemon 2: ()</h2>
+                <div class="pokemon" id="pokemon2">
+                    <div id="pokemon_front" class="pokemon_front">
+                        <img src="" alt="Pokemon Front Sprite" id="pokeFront">
+                    </div>
+                    <div class="stats">
+                        <p id="hp2"></p>
+                    </div>
+                    <div class="moves" id="moves2">
+                        <h2>Moves:</h2>
+
+                    </div>
+                </div>
+                <h1>Team:</h1>
+                <div class="team">
+                </div>
             </div>
         </div>
     </div>
