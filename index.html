@@ -1,14 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="static/teamBattle.css">
+    <link rel="stylesheet" href="./static/index.css">
     <title>Welcome!</title>
 </head>
+
 <body>
-    <h1>Welcome to Pokemon Battle</h1>
-    <h2>Please proceed to the main game!</h2>
-    <a href="teamBattle.html"> Team Battle</a>
+    <div class="wrapper">
+
+        <h1>Welcome to Pokemon Battle</h1>
+        <h2>Please proceed to the main game!</h2>
+        <!-- <div class="players section">
+            <div class="left">
+                <h2>Player 1</h2>
+                <h3>Choose your Alias</h3>
+                <input type="text" name="player1" id="player1Name" placeholder="Please enter your Alias">
+            </div>
+            <div class="right">
+
+                <h2>Player 1</h2>
+                <h3>Choose your Alias</h3>
+                <input type="text" name="player1" id="player1Name" placeholder="Please enter your Alias">
+            </div>
+        </div> -->
+        <div class="instruction-section section">
+            <h1>Instrucions</h1>
+            <ol>
+                <li>Each Player chooses their Moves</li>
+                <li>When both players are ready hit Battle!</li>
+                <li>Gameplay updates are shown through the instruction section</li>
+                <li>Pokemon whose HP goes to zero, faints. Click on the team members to select another pokemon</li>
+                <li>Person whose all pokemons faint first, looses</li>
+            </ol>
+        </div>
+        <a href="teamBattle.html"> Team Battle</a>
+    </div>
 </body>
+
 </html>

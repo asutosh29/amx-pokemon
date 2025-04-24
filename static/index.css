@@ -1,0 +1,57 @@
+:root {
+    font-family: "Press Start 2P",Arial, Helvetica, sans-serif;
+    --primary: #FF8811;
+    --secondary: #F4D06F;
+    --green:#47d513;
+    --white: #FFF8F0;
+    --black:black;
+    --text-primary:#000000;
+    --text-secondary:#41414A;
+    --accent:#C52018;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--secondary);
+    color: var(--text-primary);
+}
+
+.wrapper{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    width: 100%;
+}
+
+.section{
+    margin: 1rem 2rem;
+    width: 80%;
+    border: 3px solid black;
+    border-radius: 1rem;
+    padding: 2rem;
+}
+
+
+
+
+.players{
+
+    display: flex;
+    margin: 2rem;
+}
+
+.left,.right{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center
+    ;
+    width: 50%;
+}
