@@ -534,7 +534,6 @@ function updateUI() {
 
 async function randInt(a, b) {
     const r = Math.floor(Math.random() * (b-a) + a)
-    console.log(r)
     return r
 }
 
@@ -544,21 +543,19 @@ async function startGame() {
     await loading("Game is loading...")
     player1pokemonIndex = []
     player2pokemonIndex = []
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 3; i++) {
         let r1 = await randInt(1,50)
         let r2 = await randInt(1,50)
         player1pokemonIndex.push(r1);
         player2pokemonIndex.push(r2);
     }
-    console.log(player1pokemonIndex)
-    console.log(player2pokemonIndex)
 
-    player1Pokemon = ['pikachu', 'raichu', 'squirtle']
-    await initPlayer1(alias = 'AMX', player1Pokemon)
-    // await initPlayer1(alias = 'AMX', player1pokemonIndex)
-    player2Pokemon = ['charmander', 'bulbasaur', 'pidgey']
-    await initPlayer2(alias = 'BMX', player2Pokemon)
-    // await initPlayer2(alias = 'BMX', player2pokemonIndex)
+    // player1Pokemon = ['pikachu', 'raichu', 'squirtle']
+    // player2Pokemon = ['charmander', 'bulbasaur', 'pidgey']
+    // await initPlayer1(alias = 'AMX', player1Pokemon)
+    await initPlayer1(alias = '', player1pokemonIndex)
+    // await initPlayer2(alias = 'BMX', player2Pokemon)
+    await initPlayer2(alias = '', player2pokemonIndex)
     await renderTeam1()
     await renderTeam2()
 
@@ -630,6 +627,8 @@ function changeTeamMember2(e) {
     }
 }
 
+let playSound = 1
+
 const team2 = document.querySelector('.right .team')
 team2.addEventListener('click', changeTeamMember2)
 
@@ -639,7 +638,14 @@ vol1.addEventListener('click', () => {
 })
 const vol2 = document.getElementById('volume2')
 vol2.addEventListener('click', () => {
-    mySound.play()
+    if(playSound >=0){
+        vol2.innerText = "Sound OFF"
+        mySound.play()
+    }else{
+        vol2.innerText = "Sound ON"
+        mySound.pause()
+    }
+    playSound *= -1
 })
 const vol3 = document.getElementById('volume3')
 vol3.addEventListener('click', () => {
