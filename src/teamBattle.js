@@ -17,6 +17,7 @@ const move = {
 */
 
 
+let mySound = new Audio("../static/battle.mp3")
 
 
 function log() {
@@ -515,6 +516,7 @@ function endGame(winner) {
 }
 
 async function battle() {
+    mySound.play()
     game.rounds++;
     const battleBtn = document.getElementById('battle-btn')
     if (player1.currentMove === null || player2.currentMove === null) {
@@ -557,6 +559,8 @@ async function startGame() {
     const loader = document.getElementById('loader')
     loader.style.display = "none"
     await instructor("Choose your Moves!!!")
+
+    
 
 
 }
@@ -627,6 +631,15 @@ function changeTeamMember2(e) {
 
 const team2 = document.querySelector('.right .team')
 team2.addEventListener('click', changeTeamMember2)
+
+const vol1 = document.getElementById('volume1')
+vol1.addEventListener('click', ()=>{
+    mySound.play()
+})
+const vol2 = document.getElementById('volume2')
+vol2.addEventListener('click', ()=>{
+    mySound.play()
+})
 
 
 
