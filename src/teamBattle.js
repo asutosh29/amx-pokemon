@@ -24,6 +24,11 @@ const player2 = {
     'pokemonsLeft': null,
 }
 
+function log(){
+    console.log(player1)
+    console.log(player2)
+}
+
 
 
 // Utils
@@ -73,9 +78,24 @@ async function getPokemonData(name) {
 
     let cnt = 0
     let move_i = 0
-    let reject = []
+    let chosen = []
     while (cnt < 4) {
         let i = await randInt(0, pok.moves.length - 1)
+        
+        // Remove Same Moves
+        let repeat = false
+        for (const e of chosen) {
+            if (e == i) {
+                repeat = true
+            }else{
+                chosen.push(i)
+            }
+        }
+
+        if(repeat){
+            cnt++
+            continue
+        }
 
         const move = {
             'name': null,
@@ -93,7 +113,7 @@ async function getPokemonData(name) {
         move.pp = moveData.pp ? moveData.pp : 0
         move.power = moveData.power ? moveData.power : 0
         pokemon.moves.push(move)
-        move_i++
+        // move_i++
         cnt++
     }
     return pokemon
@@ -254,7 +274,7 @@ async function renderTeam1() {
         // DOM Elements
         const member = document.createElement('div')
         member.classList.add('member')
-        member.id = i //i
+        member.id = i
 
         const pokNameElem = document.createElement('h3')
         pokNameElem.innerText = `Name: ${pokName}`
@@ -399,10 +419,17 @@ async function computeDamage() {
                 battlePokemon1.classList.add('animate1')
             } else {
                 battlePokemon1.classList.add('animate1')
+            }
 
+            if (battlePokemon2.classList.contains('damage')) {
+                battlePokemon2.classList.remove('damage')
+                battlePokemon2.classList.add('damage')
+            } else {
+                battlePokemon2.classList.add('damage')
             }
             await sleep(2000)
             battlePokemon1.classList.remove('animate1')
+            battlePokemon2.classList.remove('damage')
 
             instructor(`${player1CurrentPokemon.name} gave ${player2DamageTaken} hp damage`)
             await sleep(1000)
@@ -418,7 +445,7 @@ async function computeDamage() {
             player2.pokemonsLeft--;
             // Checking if team is exhausted or not
             if (player2.pokemonsLeft === 0) {
-                
+
                 await endGame({ 'name': 'Player 1' })
             } else {
                 document.getElementById('moves2').innerText = ''
@@ -459,8 +486,16 @@ async function computeDamage() {
                         battlePokemon2.classList.add('animate2')
 
                     }
+
+                    if (battlePokemon1.classList.contains('damage')) {
+                        battlePokemon1.classList.remove('damage')
+                        battlePokemon1.classList.add('damage')
+                    } else {
+                        battlePokemon1.classList.add('damage')
+                    }
                     await sleep(2000)
                     battlePokemon2.classList.remove('animate2')
+                    battlePokemon1.classList.remove('damage')
 
                     instructor(`${player2CurrentPokemon.name} gave ${player1DamageTaken} hp damage`)
                     await sleep(1000)
@@ -521,7 +556,7 @@ async function endGame(winner) {
 async function battle() {
 
     game.rounds++;
-    
+
     const battleBtn = document.getElementById('battle-btn')
     if (player1.currentMove === null || player2.currentMove === null) {
         instructor("Please Choose your Moves!!!")
@@ -537,9 +572,9 @@ async function battle() {
         }
     }
 
-    if(player1.currentPokemon === null || player2.currentPokemon === null ){
+    if (player1.currentPokemon === null || player2.currentPokemon === null) {
         battleBtn.style.display = "none"
-    }else{
+    } else {
         battleBtn.style.display = "block"
     }
 
@@ -568,9 +603,11 @@ async function startGame() {
         player1pokemonIndex.push(r1);
         player2pokemonIndex.push(r2);
     }
-
+    const tempPokemon = ['caterpie']
     await initPlayer1(alias = '', player1pokemonIndex)
+    // await initPlayer1(alias = '', tempPokemon)
     await initPlayer2(alias = '', player2pokemonIndex)
+    // await initPlayer2(alias = '', tempPokemon)
     await renderTeam1()
     await renderTeam2()
 
@@ -601,6 +638,10 @@ player1Moves.addEventListener('click', (e) => {
         }
         parent.classList.add('selectedMove')
         player1.currentMove = parseInt(parent.id)
+
+        if (player1.currentMove !== null && player2.currentMove !== null) {
+            instructor("Ready To Play! Click on Battle!")
+        }
     }
 })
 const player2Moves = document.getElementById('moves2')
@@ -612,15 +653,17 @@ player2Moves.addEventListener('click', (e) => {
             child.classList.remove('selectedMove')
         }
         parent.classList.add('selectedMove')
-
         player2.currentMove = parseInt(parent.id)
+        
+        if (player1.currentMove !== null && player2.currentMove !== null) {
+            instructor("Ready To Play! Click on Battle!")
+        }
     }
 })
 const battleBtn = document.getElementById('battle-btn')
 battleBtn.addEventListener('click', battle)
 
 // Team Member Change
-
 function changeTeamMember1(e) {
     if (e.target.classList.contains('member-img')) {
         const newPokemonID = e.target.parentElement.id
@@ -628,7 +671,7 @@ function changeTeamMember1(e) {
         const newPokemon = player1.pokemons[newPokemonID]
         renderPokemon1(newPokemon)
         const btn = document.getElementById('battle-btn')
-        if(player2.currentPokemon !== null){
+        if (player2.currentPokemon !== null) {
             btn.style.display = "block"
         }
     }
@@ -644,7 +687,7 @@ function changeTeamMember2(e) {
         const newPokemon = player2.pokemons[newPokemonID]
         renderPokemon2(newPokemon)
         const btn = document.getElementById('battle-btn')
-        if(player1.currentPokemon !== null){
+        if (player1.currentPokemon !== null) {
             btn.style.display = "block"
         }
     }
