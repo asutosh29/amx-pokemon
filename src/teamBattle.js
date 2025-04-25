@@ -391,8 +391,6 @@ async function computeDamage() {
         isAttackValidPlayer2 = false
     }
 
-    if (player1GoesFirst) {
-    }
 
     {
         // 
@@ -435,6 +433,7 @@ async function computeDamage() {
             await sleep(1000)
         } else {
             // ATTACK is MISSED
+            player1CurrentPokemon.moves[player1.currentMove].pp--;
             instructor(`${player1CurrentPokemon.name} Attack missed!`)
             await sleep(2000)
             renderPokemon1(player1CurrentPokemon)
@@ -500,6 +499,7 @@ async function computeDamage() {
                     instructor(`${player2CurrentPokemon.name} gave ${player1DamageTaken} hp damage`)
                     await sleep(1000)
                 } else {
+                    player2CurrentPokemon.moves[player2.currentMove].pp--;
                     instructor(`${player2CurrentPokemon.name} Attack missed!`)
                     await sleep(2000)
                     renderPokemon2(player2CurrentPokemon)
@@ -533,10 +533,8 @@ async function computeDamage() {
         }
 
     }
-
-
-
-
+    player1.currentMove = null
+    player2.currentMove = null
 
 }
 
