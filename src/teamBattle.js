@@ -1,13 +1,5 @@
 let mySound = new Audio("../static/battle.mp3")
 
-
-function log() {
-    console.log("--- Player 1 ---")
-    console.log(player1)
-    console.log("--- Player 2 ---")
-    console.log(player2)
-}
-
 // DB
 const game = {
     'rounds': 0,
@@ -114,9 +106,8 @@ async function getMoveData(apiLink) {
 }
 
 
+// RENDERING FUNCTIONS
 async function renderPokemon1(pok) {
-
-
     const pokName = pok.name
     const hp = `HP: ${pok.hp}`
     const pokFrontSprite = pok.frontSprite
@@ -214,6 +205,7 @@ async function renderPokemon2(pok) {
     hp2Bar.style.width = `${pok.hp / pok.base_hp * 100}%`
 }
 
+
 function updatePokemon1(pok) {
     const hp1 = document.getElementById('hp1')
     if (pok.hp <= 0) {
@@ -237,6 +229,8 @@ function updatePokemon2(pok) {
     }
     hp2Bar.style.width = `${pok.hp / pok.base_hp * 100}%`
 }
+
+
 
 async function renderTeam1() {
     const team = document.querySelector('.left .team')
@@ -271,11 +265,9 @@ async function renderTeam1() {
         pokFrontSpriteElem.src = pokFrontSprite
 
         member.append(pokHPElem, pokFrontSpriteElem)
-        // member.append(pokNameElem, pokHPElem, pokFrontSpriteElem)
         team.append(member)
     }
 }
-
 async function renderTeam2() {
     const team = document.querySelector('.right .team')
     team.innerText = ''
@@ -310,7 +302,6 @@ async function renderTeam2() {
         pokFrontSpriteElem.src = pokFrontSprite
 
         member.append(pokHPElem, pokFrontSpriteElem)
-        // member.append(pokNameElem, pokHPElem, pokFrontSpriteElem)
         team.append(member)
     }
 }
@@ -321,7 +312,6 @@ async function faint(id) {
     pokemonName.innerHTML = ""
     document.getElementById(`pokemonBattle${id}`).src = "./static/empty.png"
 }
-// CallBacks
 
 
 // GAME LOGIC
@@ -402,7 +392,6 @@ async function computeDamage() {
             renderPokemon1(player1CurrentPokemon)
             updatePokemon2(player2CurrentPokemon)
             updateUI()
-            // if (player2CurrentPokemon.hp <= 0) {
 
             // }
             if (battlePokemon1.classList.contains('animate1')) {
@@ -429,7 +418,6 @@ async function computeDamage() {
             player2.pokemonsLeft--;
             // Checking if team is exhausted or not
             if (player2.pokemonsLeft === 0) {
-                // await endGame({ 'name': player1.alias })
                 
                 await endGame({ 'name': 'Player 1' })
             } else {
@@ -460,7 +448,6 @@ async function computeDamage() {
 
                     // UI UPDATES
                     renderPokemon2(player2CurrentPokemon)
-                    // renderPokemon1(player1CurrentPokemon)
                     updatePokemon1(player1CurrentPokemon)
                     updateUI()
 
@@ -492,7 +479,6 @@ async function computeDamage() {
                     player1.currentMove = null
                     player1.pokemonsLeft--;
                     if (player1.pokemonsLeft === 0) {
-                        // await endGame({ 'name': player2.alias })
                         await endGame({ 'name': 'Player 2' })
                     } else {
                         player1.currentPokemon = null
@@ -529,8 +515,6 @@ async function endGame(winner) {
     moves2.remove()
     battle.remove()
     await sleep(5000)
-    // const backBtn = document.getElementById('backLink')
-    // backBtn.click()
 
 }
 
@@ -585,13 +569,7 @@ async function startGame() {
         player2pokemonIndex.push(r2);
     }
 
-    // player1Pokemon = ['pikachu', 'raichu', 'squirtle']
-    player2Pokemon = ['pikachu']
-    // player2Pokemon = ['charmander', 'bulbasaur', 'pidgey']
-    player1Pokemon = ['charmander']
-    // await initPlayer1(alias = 'A', player1Pokemon)
     await initPlayer1(alias = '', player1pokemonIndex)
-    // await initPlayer2(alias = 'B', player2Pokemon)
     await initPlayer2(alias = '', player2pokemonIndex)
     await renderTeam1()
     await renderTeam2()
