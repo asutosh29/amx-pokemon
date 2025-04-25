@@ -36,7 +36,6 @@ const player2 = {
 
 // Utils
 async function instructor(...instruction) {
-
     const instructionsId = document.getElementById('instructions')
     instructionsId.innerText = ""
     for (const inst of instruction) {
@@ -81,10 +80,11 @@ async function getPokemonData(name) {
     pokemon.moves = [] //List of all moves
 
     let cnt = 0
+    let move_i = 0
     let reject = []
-    while(cnt < 4) {
-        let i = await randInt(0,4)
-        
+    while (cnt < 4) {
+        let i = await randInt(0, pok.moves.length - 1)
+
         const move = {
             'name': null,
             'accuracy': null,
@@ -92,7 +92,8 @@ async function getPokemonData(name) {
             'power': null,
         }
         let moveData = await getMoveData(pok.moves[i].move.url)
-        if(!moveData.accuracy || !moveData.pp || !moveData.power){
+        if (!moveData.accuracy || !moveData.pp || !moveData.power) {
+            move_i++;
             continue
         }
         move.name = moveData.name
@@ -100,6 +101,7 @@ async function getPokemonData(name) {
         move.pp = moveData.pp ? moveData.pp : 0
         move.power = moveData.power ? moveData.power : 0
         pokemon.moves.push(move)
+        move_i++
         cnt++
     }
     return pokemon
@@ -314,7 +316,7 @@ async function renderTeam2() {
 }
 
 
-function faint(id) {
+async function faint(id) {
     const pokemonName = document.getElementById(`player${id}`)
     pokemonName.innerHTML = ""
     document.getElementById(`pokemonBattle${id}`).src = "./static/empty.png"
@@ -365,138 +367,160 @@ async function computeDamage() {
 
     const player1CurrentPokemon = player1.pokemons[player1.currentPokemon]
     const player2CurrentPokemon = player2.pokemons[player2.currentPokemon]
-    // --- PLAYER 2 DAMAGE START
     let rand1 = Math.random() * 100
     let rand2 = Math.random() * 100
     let isAttackValidPlayer1 = true
     let isAttackValidPlayer2 = true
+    let player1GoesFirst = true
 
-
-
+    // SET MOVE MISS FLAGS
     if (player1CurrentPokemon.moves[player1.currentMove].accuracy < rand1) {
         isAttackValidPlayer1 = false
-
     }
     if (player2CurrentPokemon.moves[player2.currentMove].accuracy < rand2) {
         isAttackValidPlayer2 = false
     }
 
-    if (isAttackValidPlayer1) {
-        const player2DamageTaken = player1CurrentPokemon.moves[player1.currentMove].power * multiplier
-        player2CurrentPokemon.hp -= player2DamageTaken
-        player1CurrentPokemon.moves[player1.currentMove].pp--;
+    if (player1GoesFirst) {
+    }
 
-        instructor(`${player1CurrentPokemon.name} used ${player1CurrentPokemon.moves[player1.currentMove].name}`)
-        player1.currentMove = null
-        await sleep(1000)
+    {
+        // 
+        // PLAYER 1 PLAYS LOGIC
+        // 
+        if (isAttackValidPlayer1) {
 
-        // UI UPDATES
-        renderPokemon1(player1CurrentPokemon)
-        updatePokemon2(player2CurrentPokemon)
-        updateUI()
+            const player2DamageTaken = player1CurrentPokemon.moves[player1.currentMove].power * multiplier
+            player2CurrentPokemon.hp -= player2DamageTaken
+            player1CurrentPokemon.moves[player1.currentMove].pp--;
+
+            instructor(`${player1CurrentPokemon.name} used ${player1CurrentPokemon.moves[player1.currentMove].name}`)
+            player1.currentMove = null
+            await sleep(1000)
+
+            // UI UPDATES
+            renderPokemon1(player1CurrentPokemon)
+            updatePokemon2(player2CurrentPokemon)
+            updateUI()
+            // if (player2CurrentPokemon.hp <= 0) {
+
+            // }
+            if (battlePokemon1.classList.contains('animate1')) {
+                battlePokemon1.classList.remove('animate1')
+                battlePokemon1.classList.add('animate1')
+            } else {
+                battlePokemon1.classList.add('animate1')
+
+            }
+            await sleep(2000)
+            battlePokemon1.classList.remove('animate1')
+
+            instructor(`${player1CurrentPokemon.name} gave ${player2DamageTaken} hp damage`)
+            await sleep(1000)
+        } else {
+            // ATTACK is MISSED
+            instructor(`${player1CurrentPokemon.name} Attack missed!`)
+            await sleep(2000)
+            renderPokemon1(player1CurrentPokemon)
+        }
+        // CHECK PLAYER FAINT
         if (player2CurrentPokemon.hp <= 0) {
             player2.currentMove = null
-        }
-        if (battlePokemon1.classList.contains('animate1')) {
-            battlePokemon1.classList.remove('animate1')
-            battlePokemon1.classList.add('animate1')
-        } else {
-            battlePokemon1.classList.add('animate1')
-
-        }
-        await sleep(2000)
-        battlePokemon1.classList.remove('animate1')
-
-        instructor(`${player1CurrentPokemon.name} gave ${player2DamageTaken} hp damage`)
-        await sleep(1000)
-    } else {
-        instructor(`${player1CurrentPokemon.name} Attack missed!`)
-        await sleep(2000)
-        renderPokemon1(player1CurrentPokemon)
-    }
-
-    // --- PLAYER 2 DAMAGE END
-
-    // Check if to continue the game or Not
-    if (player2CurrentPokemon.hp <= 0) {
-        player2.pokemonsLeft--;
-        // Checking if team is exhausted or not
-        if (player2.pokemonsLeft === 0) {
-            endGame({ 'name': player1.alias })
-        } else {
-            document.getElementById('moves2').innerText = ''
-            player2.currentPokemon = null
-
-            faint(2)
-            instructor(`${player2CurrentPokemon.name} fainted`)
-            await sleep(2000)
-            instructor(`${player2.alias} please select another Pokemon!`)
-            updateUI()
-        }
-
-    } else {
-        if (isAttackValidPlayer2) {
-
-
-            const player1DamageTaken = player2CurrentPokemon.moves[player2.currentMove].power * multiplier
-            player1CurrentPokemon.hp -= player1DamageTaken
-            player2CurrentPokemon.moves[player2.currentMove].pp--;
-
-            instructor(`${player2CurrentPokemon.name} used ${player2CurrentPokemon.moves[player2.currentMove].name}`)
-            player1.currentMove = null
-            await sleep(1000)
-
-            if (battlePokemon2.classList.contains('animate2')) {
-
-                battlePokemon2.classList.remove('animate2')
-                battlePokemon2.classList.add('animate2')
+            player2.pokemonsLeft--;
+            // Checking if team is exhausted or not
+            if (player2.pokemonsLeft === 0) {
+                // await endGame({ 'name': player1.alias })
+                
+                await endGame({ 'name': 'Player 1' })
             } else {
-                battlePokemon2.classList.add('animate2')
+                document.getElementById('moves2').innerText = ''
+                player2.currentPokemon = null
 
-            }
-            await sleep(2000)
-            battlePokemon2.classList.remove('animate2')
-
-            instructor(`${player2CurrentPokemon.name} gave ${player1DamageTaken} hp damage`)
-            await sleep(1000)
-
-            renderPokemon1(player1CurrentPokemon)
-            updatePokemon1(player1CurrentPokemon)
-            renderPokemon2(player2CurrentPokemon)
-            updateUI()
-        } else {
-            instructor(`${player2CurrentPokemon.name} Attack missed!`)
-            await sleep(2000)
-            renderPokemon2(player2CurrentPokemon)
-        }
-
-        instructor(`Please Select Moves`)
-        await sleep(500)
-
-
-        if (player1CurrentPokemon.hp <= 0) {
-            player1.currentMove = null
-        }
-        // updatePokemon1(player1CurrentPokemon)
-        renderPokemon1(player1CurrentPokemon)
-        if (player1CurrentPokemon.hp <= 0) {
-            player1.pokemonsLeft--;
-            if (player1.pokemonsLeft === 0) {
-                endGame({ 'name': player2.alias })
-            } else {
-                document.getElementById('moves1').innerText = ''
-                faint(1)
-                instructor(`${player1CurrentPokemon.name} fainted `)
+                await faint(2)
+                instructor(`${player2CurrentPokemon.name} fainted`)
                 await sleep(2000)
-                instructor(`${player1.alias} please select another Pokemon!`)
+                instructor(`${player2.alias} please select another Pokemon!`)
                 updateUI()
             }
+            //REMOVE ELSE FROM HERE 
+        } else {
+            {
+                // 
+                // PLAYER 2 PLAYS LOGIC
+                //
+                if (isAttackValidPlayer2) {
 
+                    const player1DamageTaken = player2CurrentPokemon.moves[player2.currentMove].power * multiplier
+                    player1CurrentPokemon.hp -= player1DamageTaken
+                    player2CurrentPokemon.moves[player2.currentMove].pp--;
+
+                    instructor(`${player2CurrentPokemon.name} used ${player2CurrentPokemon.moves[player2.currentMove].name}`)
+                    player2.currentMove = null
+                    await sleep(1000)
+
+                    // UI UPDATES
+                    renderPokemon2(player2CurrentPokemon)
+                    // renderPokemon1(player1CurrentPokemon)
+                    updatePokemon1(player1CurrentPokemon)
+                    updateUI()
+
+                    if (battlePokemon2.classList.contains('animate2')) {
+
+                        battlePokemon2.classList.remove('animate2')
+                        battlePokemon2.classList.add('animate2')
+                    } else {
+                        battlePokemon2.classList.add('animate2')
+
+                    }
+                    await sleep(2000)
+                    battlePokemon2.classList.remove('animate2')
+
+                    instructor(`${player2CurrentPokemon.name} gave ${player1DamageTaken} hp damage`)
+                    await sleep(1000)
+                } else {
+                    instructor(`${player2CurrentPokemon.name} Attack missed!`)
+                    await sleep(2000)
+                    renderPokemon2(player2CurrentPokemon)
+                }
+
+
+                await sleep(500)
+                instructor(`Please Select Moves`)
+
+                renderPokemon1(player1CurrentPokemon)
+                if (player1CurrentPokemon.hp <= 0) {
+                    player1.currentMove = null
+                    player1.pokemonsLeft--;
+                    if (player1.pokemonsLeft === 0) {
+                        // await endGame({ 'name': player2.alias })
+                        await endGame({ 'name': 'Player 2' })
+                    } else {
+                        player1.currentPokemon = null
+
+                        document.getElementById('moves1').innerText = ''
+                        await faint(1)
+                        instructor(`${player1CurrentPokemon.name} fainted `)
+                        await sleep(2000)
+                        instructor(`${player1.alias} please select another Pokemon!`)
+                        updateUI()
+                    }
+
+                }
+
+
+            }
         }
+
     }
 
+
+
+
+
 }
-function endGame(winner) {
+
+
+async function endGame(winner) {
     instructor("Game ended!", `Winner ${winner.name}`)
     const battle = (document.getElementById('battle-btn'))
     const moves1 = document.getElementById('moves1')
@@ -504,16 +528,21 @@ function endGame(winner) {
     moves1.remove()
     moves2.remove()
     battle.remove()
+    await sleep(5000)
+    // const backBtn = document.getElementById('backLink')
+    // backBtn.click()
+
 }
 
 async function battle() {
 
     game.rounds++;
+    
     const battleBtn = document.getElementById('battle-btn')
     if (player1.currentMove === null || player2.currentMove === null) {
         instructor("Please Choose your Moves!!!")
     } else {
-        battleBtn.style.display = "None"
+        battleBtn.style.display = "none"
         if (player1.pokemons[player1.currentPokemon].hp >= 0 && player2.pokemons[player2.currentPokemon].hp >= 0) {
             if (player1.pokemons[player1.currentPokemon].moves[player1.currentMove].pp === 0 || player2.pokemons[player2.currentPokemon].moves[player2.currentMove].pp === 0) {
                 instructor("Please select a Move with Valid PP")
@@ -523,7 +552,12 @@ async function battle() {
             }
         }
     }
-    battleBtn.style.display = "block"
+
+    if(player1.currentPokemon === null || player2.currentPokemon === null ){
+        battleBtn.style.display = "none"
+    }else{
+        battleBtn.style.display = "block"
+    }
 
 }
 
@@ -533,7 +567,7 @@ function updateUI() {
 }
 
 async function randInt(a, b) {
-    const r = Math.floor(Math.random() * (b-a) + a)
+    const r = Math.floor(Math.random() * (b - a) + a)
     return r
 }
 
@@ -543,18 +577,21 @@ async function startGame() {
     await loading("Game is loading...")
     player1pokemonIndex = []
     player2pokemonIndex = []
+
     for (let i = 0; i < 3; i++) {
-        let r1 = await randInt(1,50)
-        let r2 = await randInt(1,50)
+        let r1 = await randInt(1, 50)
+        let r2 = await randInt(1, 50)
         player1pokemonIndex.push(r1);
         player2pokemonIndex.push(r2);
     }
 
     // player1Pokemon = ['pikachu', 'raichu', 'squirtle']
+    player2Pokemon = ['pikachu']
     // player2Pokemon = ['charmander', 'bulbasaur', 'pidgey']
-    // await initPlayer1(alias = 'AMX', player1Pokemon)
+    player1Pokemon = ['charmander']
+    // await initPlayer1(alias = 'A', player1Pokemon)
     await initPlayer1(alias = '', player1pokemonIndex)
-    // await initPlayer2(alias = 'BMX', player2Pokemon)
+    // await initPlayer2(alias = 'B', player2Pokemon)
     await initPlayer2(alias = '', player2pokemonIndex)
     await renderTeam1()
     await renderTeam2()
@@ -612,6 +649,10 @@ function changeTeamMember1(e) {
         player1.currentPokemon = newPokemonID
         const newPokemon = player1.pokemons[newPokemonID]
         renderPokemon1(newPokemon)
+        const btn = document.getElementById('battle-btn')
+        if(player2.currentPokemon !== null){
+            btn.style.display = "block"
+        }
     }
 }
 
@@ -624,6 +665,10 @@ function changeTeamMember2(e) {
         player2.currentPokemon = newPokemonID
         const newPokemon = player2.pokemons[newPokemonID]
         renderPokemon2(newPokemon)
+        const btn = document.getElementById('battle-btn')
+        if(player1.currentPokemon !== null){
+            btn.style.display = "block"
+        }
     }
 }
 
@@ -638,19 +683,16 @@ vol1.addEventListener('click', () => {
 })
 const vol2 = document.getElementById('volume2')
 vol2.addEventListener('click', () => {
-    if(playSound >=0){
-        vol2.innerText = "Sound OFF"
-        mySound.play()
-    }else{
+    if (playSound >= 0) {
         vol2.innerText = "Sound ON"
+        mySound.play()
+    } else {
+        vol2.innerText = "Sound OFF"
         mySound.pause()
     }
     playSound *= -1
 })
-const vol3 = document.getElementById('volume3')
-vol3.addEventListener('click', () => {
-    mySound.pause()
-})
+
 
 
 
